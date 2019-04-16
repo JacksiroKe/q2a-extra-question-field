@@ -22,7 +22,7 @@ class qa_html_theme_layer extends qa_html_theme_base {
 	}
 	function head_script() {
 		qa_html_theme_base::head_script();
-		if(count($this->extradata) && $this->qa_eqf_file_exist() && qa_opt(qa_eqf::LIGHTBOX_EFFECT)) {
+		if(count((array)$this->extradata) && $this->qa_eqf_file_exist() && qa_opt(qa_eqf::LIGHTBOX_EFFECT)) {
 			$this->output('<SCRIPT TYPE="text/javascript" SRC="'.$this->pluginurl.'magnific-popup/jquery.magnific-popup.min.js"></SCRIPT>');
 			$this->output('<SCRIPT TYPE="text/javascript">');
 			$this->output('$(function(){');
@@ -47,7 +47,7 @@ class qa_html_theme_layer extends qa_html_theme_base {
 	}
 	function head_css() {
 		qa_html_theme_base::head_css();
-		if(count($this->extradata) && $this->qa_eqf_file_exist() && qa_opt(qa_eqf::LIGHTBOX_EFFECT)) {
+		if(count((array)$this->extradata) && $this->qa_eqf_file_exist() && qa_opt(qa_eqf::LIGHTBOX_EFFECT)) {
 			$this->output('<LINK REL="stylesheet" TYPE="text/css" href="'.$this->pluginurl.'magnific-popup/magnific-popup.css"/>');
 		}
 	}

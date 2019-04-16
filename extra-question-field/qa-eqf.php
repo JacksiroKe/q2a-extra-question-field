@@ -101,7 +101,7 @@ class qa_eqf {
 	var $extra_field_note_height;
 	var $extra_field_option_height;
 
-	function qa_eqf() {
+	public function __construct() {
 		$this->extra_field_count = self::FIELD_COUNT_DFL;
 		$this->extra_field_maxfile_size = self::MAXFILE_SIZE_DFL;
 		$this->extra_field_only_image = self::ONLY_IMAGE_DFL;
@@ -113,6 +113,7 @@ class qa_eqf {
 		$this->extra_field_note_height = self::FIELD_NOTE_HEIGHT;
 		$this->extra_field_option_height = self::FIELD_OPTION_HEIGHT;
 	}
+	
 	function init_extra_fields($count) {
 		$this->extra_fields = array();
 		for($key=1; $key<=$count; $key++) {

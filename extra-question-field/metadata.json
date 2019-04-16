@@ -1,0 +1,11 @@
+{
+	"name": "Extra Question Field",
+	"description": "Add extra field on question form",
+	"version": "2.0",
+	"date": "2015-02-04",
+	"author": "Jack Siro",
+	"author_uri": "http://github.com/jacksiro",
+	"license": "GPLv2",
+	"min_q2a": "1.6",
+	"load_order": "after_db_init"
+}
