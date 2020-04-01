@@ -1,15 +1,15 @@
-# Q2A-Extra-Question-Field-Plugin
+# Q2A-q2a-extra-question-field-Plugin
 Enhance your Extra Question field with file management
 /*******************************************************************/
-Extra Question Field plugin for question2answer
+Extra Question Field plugin for question2question
 /*******************************************************************/
 
 /*-----------------------------------------------------------------*/
 1. Summary
 /*-----------------------------------------------------------------*/
-This package is plugin for question2answer.
+This package is plugin for question2question.
 
-question2answer: http://www.question2answer.org/
+question2question: http://www.question2question.org/
 
 /*-----------------------------------------------------------------*/
 2. Feature of this plugin
@@ -19,13 +19,13 @@ question2answer: http://www.question2answer.org/
 /*-----------------------------------------------------------------*/
 3. Version compatibility
 /*-----------------------------------------------------------------*/
-question2answer V1.6 later
+question2question V1.6 later
 
 /*-----------------------------------------------------------------*/
 4. Installation/Settings
 /*-----------------------------------------------------------------*/
 1.Unzip archive any local folder.
-2.Upload extra-question-field folder under qa-plugin folder.
+2.Upload q2a-extra-question-field folder under qa-plugin folder.
 3.Log in administrator account.
 4.Select admin -> plugins menu.
 5.After setting, and save.
@@ -36,7 +36,7 @@ question2answer V1.6 later
 1.Log in administrator account.
 2.Select admin -> plugins menu.
 3.Click reset button.
-4.Delete extra-question-field folder under qa-plugin folder.
+4.Delete q2a-extra-question-field folder under qa-plugin folder.
 
 /*-----------------------------------------------------------------*/
 6. Options
@@ -115,7 +115,7 @@ If input value is blank, form will be error.
 /*-----------------------------------------------------------------*/
 1.This software obeys license of Question2Answer.
 2.The author does not always promise to support.
-3.The author does not compensate you for what kind of damage that you used question2answer or this file.
+3.The author does not compensate you for what kind of damage that you used question2question or this file.
 
 /*-----------------------------------------------------------------*/
 8. Author/Creator

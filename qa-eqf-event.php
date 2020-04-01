@@ -4,7 +4,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 	exit;
 }
 require_once QA_INCLUDE_DIR.'qa-db-metas.php';
-require_once QA_PLUGIN_DIR.'extra-question-field/qa-eqf.php';
+require_once QA_PLUGIN_DIR.'q2a-extra-question-field/qa-eqf.php';
 
 class qa_eqf_event {
 
@@ -14,9 +14,9 @@ class qa_eqf_event {
 		case 'q_queue':
 		case 'q_post':
 		case 'q_edit':
-			for($key=1; $key<=qa_eqf::FIELD_COUNT_MAX; $key++) {
-				if((bool)qa_opt(qa_eqf::FIELD_ACTIVE.$key)) {
-					$name = qa_eqf::FIELD_BASE_NAME.$key;
+			for($key=1; $key<=qa_eqf::field_count_max; $key++) {
+				if((bool)qa_opt(qa_eqf::field_active.$key)) {
+					$name = qa_eqf::field_base_name.$key;
 					if(isset($qa_extra_question_fields[$name]))
 						$content = qa_sanitize_html($qa_extra_question_fields[$name]['value']);
 					else
@@ -28,9 +28,9 @@ class qa_eqf_event {
 			}
 			break;
 		case 'q_delete':
-			for($key=1; $key<=qa_eqf::FIELD_COUNT_MAX; $key++) {
-				if((bool)qa_opt(qa_eqf::FIELD_ACTIVE.$key)) {
-					$name = qa_eqf::FIELD_BASE_NAME.$key;
+			for($key=1; $key<=qa_eqf::field_count_max; $key++) {
+				if((bool)qa_opt(qa_eqf::field_active.$key)) {
+					$name = qa_eqf::field_base_name.$key;
 					qa_db_postmeta_clear($params['postid'], 'qa_q_'.$name);
 				}
 			}

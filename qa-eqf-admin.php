@@ -19,7 +19,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 	require_once QA_INCLUDE_DIR . 'app/admin.php';
 	require_once QA_INCLUDE_DIR . 'qa-theme-base.php';
 	require_once QA_INCLUDE_DIR . 'qa-app-blobs.php';
-	require_once QA_PLUGIN_DIR . 'extra-question-field/qa-eqf.php';
+	require_once QA_PLUGIN_DIR . 'q2a-extra-question-field/qa-eqf.php';
 
 	class qa_html_theme_layer extends qa_html_theme_base {
 		var $plugin_directory;
@@ -40,46 +40,47 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			$errors = array();
 			$securityexpired = false;
 			
-			if (strtolower(qa_request_part(1)) == 'eqf') {
+			if (strtolower(qa_request_part(1)) == 'eqf_admin') {
 				$this->template = $adminsection;
-				$this->bp_navigation($adminsection);
+				$this->eqf_navigation($adminsection);
 				$this->content['suggest_next']="";
 				$this->content['error'] = $securityexpired ? qa_lang_html('admin/form_security_expired') : qa_admin_page_error();
-				$this->content['title'] = qa_lang_html('admin/admin_title') . ' - ' . qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::PLUGIN.'_nav');
+				$this->content['title'] = qa_lang_html('admin/admin_title') . ' - ' . qa_lang(qa_eqf::lang.'/'.qa_eqf::plugin.'_nav');
 				$this->content = $this->eqf_admin();
 			}
 			qa_html_theme_base::doctype();
 		}
 		
-		function nav_list($bp_navigation, $class, $level=null)
+		function nav_list($eqf_navigation, $class, $level=null)
 		{
 			if($this->template=='admin') {
 				if ($class == 'nav-sub') {
-					$bp_navigation['eqf'] = array(
-						'label' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::PLUGIN.'_nav'),
-						'url' => qa_path_html('admin/eqf'),
+					$eqf_navigation['eqf_admin'] = array(
+						'label' => qa_lang(qa_eqf::lang.'/'.qa_eqf::plugin.'_nav'),
+						'url' => qa_path_html('admin/eqf_admin'),
 					);
 				}
-				if ( $this->request == 'admin/eqf' ) $bp_navigation = array_merge(qa_admin_sub_navigation(), $bp_navigation);
+				if ( $this->request == 'admin/eqf_admin' ) $eqf_navigation = array_merge(qa_admin_sub_navigation(), $eqf_navigation);
 			}
-			if(count($bp_navigation) > 1 ) 
-				qa_html_theme_base::nav_list($bp_navigation, $class, $level=null);	
+			if(count($eqf_navigation) > 1 ) 
+				qa_html_theme_base::nav_list($eqf_navigation, $class, $level=null);	
 		}
 		
-		function bp_navigation($request)
+		function eqf_navigation($request)
 		{
 			$this->content['navigation']['sub'] = qa_admin_sub_navigation();
-			$this->content['navigation']['sub']['eqf'] = array(
-				'label' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::PLUGIN.'_nav'),	
-				'url' => qa_path_html('admin/eqf'),  
-				'selected' => ($request == 'eqf' ) ? 'selected' : '',
+			$this->content['navigation']['sub']['eqf_admin'] = array(
+				'label' => qa_lang(qa_eqf::lang.'/'.qa_eqf::plugin.'_nav'),	
+				'url' => qa_path_html('admin/eqf_admin'),  
+				'selected' => ($request == 'eqf_admin' ) ? 'selected' : '',
 			);
 			return 	$this->content['navigation']['sub'];
 		}
 		
 		function eqf_admin()
 		{
-			$eqf = new qa_eqf;			$saved = '';
+			$eqf = new qa_eqf;
+			$saved = '';
 			$error = false;
 			$error_active = array();
 			$error_prompt = array();
@@ -95,115 +96,115 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 			$error_hide_blank = array();
 			$error_required = array();
 			
-			for($key=1; $key<=qa_eqf::FIELD_COUNT_MAX; $key++) {
+			for($key=1; $key<=qa_eqf::field_count_max; $key++) {
 				$error_active[$key] = $error_prompt[$key] = $error_note[$key] = $error_type[$key] = $error_attr[$key] = $error_option[$key] = $error_default[$key] = $error_form_pos[$key] = $error_display[$key] = $error_label[$key] = $error_page_pos[$key] = $error_hide_blank[$key] = $error_required[$key] = '';
 			}
-			if (qa_clicked(qa_eqf::SAVE_BUTTON)) {
-				qa_opt(qa_eqf::FIELD_COUNT, qa_post_text(qa_eqf::FIELD_COUNT.'_field'));
-				qa_opt(qa_eqf::MAXFILE_SIZE, qa_post_text(qa_eqf::MAXFILE_SIZE.'_field'));
-				qa_opt(qa_eqf::ONLY_IMAGE, (int)qa_post_text(qa_eqf::ONLY_IMAGE.'_field'));
-				qa_opt(qa_eqf::IMAGE_MAXWIDTH, qa_post_text(qa_eqf::IMAGE_MAXWIDTH.'_field'));
-				qa_opt(qa_eqf::IMAGE_MAXHEIGHT, qa_post_text(qa_eqf::IMAGE_MAXHEIGHT.'_field'));
-				qa_opt(qa_eqf::THUMB_SIZE, qa_post_text(qa_eqf::THUMB_SIZE.'_field'));
-				qa_opt(qa_eqf::LIGHTBOX_EFFECT, (int)qa_post_text(qa_eqf::LIGHTBOX_EFFECT.'_field'));
-				$eqf->init_extra_fields(qa_post_text(qa_eqf::FIELD_COUNT.'_field'));
+			if (qa_clicked(qa_eqf::save_button)) {
+				qa_opt(qa_eqf::field_count, qa_post_text(qa_eqf::field_count.'_field'));
+				qa_opt(qa_eqf::maxfile_size, qa_post_text(qa_eqf::maxfile_size.'_field'));
+				qa_opt(qa_eqf::only_image, (int)qa_post_text(qa_eqf::only_image.'_field'));
+				qa_opt(qa_eqf::image_maxwidth, qa_post_text(qa_eqf::image_maxwidth.'_field'));
+				qa_opt(qa_eqf::image_maxheight, qa_post_text(qa_eqf::image_maxheight.'_field'));
+				qa_opt(qa_eqf::thumb_size, qa_post_text(qa_eqf::thumb_size.'_field'));
+				qa_opt(qa_eqf::lightbox_effect, (int)qa_post_text(qa_eqf::lightbox_effect.'_field'));
+				$eqf->init_extra_fields(qa_post_text(qa_eqf::field_count.'_field'));
 				foreach ($eqf->extra_fields as $key => $extra_field) {
-					if (trim(qa_post_text(qa_eqf::FIELD_PROMPT.'_field'.$key)) == '') {
-						$error_prompt[$key] = qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_PROMPT.'_error');
+					if (trim(qa_post_text(qa_eqf::field_prompt.'_field'.$key)) == '') {
+						$error_prompt[$key] = qa_lang(qa_eqf::lang.'/'.qa_eqf::field_prompt.'_error');
 						$error = true;
 					}
-					if (qa_post_text(qa_eqf::FIELD_TYPE.'_field'.$key) != qa_eqf::FIELD_TYPE_TEXT
-					&& qa_post_text(qa_eqf::FIELD_TYPE.'_field'.$key) != qa_eqf::FIELD_TYPE_TEXTAREA
-					&& qa_post_text(qa_eqf::FIELD_TYPE.'_field'.$key) != qa_eqf::FIELD_TYPE_FILE
-					&& trim(qa_post_text(qa_eqf::FIELD_OPTION.'_field'.$key)) == '') {
-						$error_option[$key] = qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_OPTION.'_error');
+					if (qa_post_text(qa_eqf::field_type.'_field'.$key) != qa_eqf::field_type_text
+					&& qa_post_text(qa_eqf::field_type.'_field'.$key) != qa_eqf::field_type_textarea
+					&& qa_post_text(qa_eqf::field_type.'_field'.$key) != qa_eqf::field_type_file
+					&& trim(qa_post_text(qa_eqf::field_option.'_field'.$key)) == '') {
+						$error_option[$key] = qa_lang(qa_eqf::lang.'/'.qa_eqf::field_option.'_error');
 						$error = true;
 					}
 					/*
-					if ((bool)qa_post_text(qa_eqf::FIELD_DISPLAY.'_field'.$key) && trim(qa_post_text(qa_eqf::FIELD_LABEL.'_field'.$key)) == '') {
-						$error_label[$key] = qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_LABEL.'_error');
+					if ((bool)qa_post_text(qa_eqf::field_display.'_field'.$key) && trim(qa_post_text(qa_eqf::field_label.'_field'.$key)) == '') {
+						$error_label[$key] = qa_lang(qa_eqf::lang.'/'.qa_eqf::field_label.'_error');
 						$error = true;
 					}
 					*/
 				}
 				foreach ($eqf->extra_fields as $key => $extra_field) {
-					qa_opt(qa_eqf::FIELD_ACTIVE.$key, (int)qa_post_text(qa_eqf::FIELD_ACTIVE.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_PROMPT.$key, qa_post_text(qa_eqf::FIELD_PROMPT.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_NOTE.$key, qa_post_text(qa_eqf::FIELD_NOTE.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_TYPE.$key, qa_post_text(qa_eqf::FIELD_TYPE.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_OPTION.$key, qa_post_text(qa_eqf::FIELD_OPTION.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_ATTR.$key, qa_post_text(qa_eqf::FIELD_ATTR.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_DEFAULT.$key, qa_post_text(qa_eqf::FIELD_DEFAULT.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_FORM_POS.$key, qa_post_text(qa_eqf::FIELD_FORM_POS.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_DISPLAY.$key, (int)qa_post_text(qa_eqf::FIELD_DISPLAY.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_LABEL.$key, qa_post_text(qa_eqf::FIELD_LABEL.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_PAGE_POS.$key, qa_post_text(qa_eqf::FIELD_PAGE_POS.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_HIDE_BLANK.$key, (int)qa_post_text(qa_eqf::FIELD_HIDE_BLANK.'_field'.$key));
-					qa_opt(qa_eqf::FIELD_REQUIRED.$key, (int)qa_post_text(qa_eqf::FIELD_REQUIRED.'_field'.$key));
+					qa_opt(qa_eqf::field_active.$key, (int)qa_post_text(qa_eqf::field_active.'_field'.$key));
+					qa_opt(qa_eqf::field_prompt.$key, qa_post_text(qa_eqf::field_prompt.'_field'.$key));
+					qa_opt(qa_eqf::field_note.$key, qa_post_text(qa_eqf::field_note.'_field'.$key));
+					qa_opt(qa_eqf::field_type.$key, qa_post_text(qa_eqf::field_type.'_field'.$key));
+					qa_opt(qa_eqf::field_option.$key, qa_post_text(qa_eqf::field_option.'_field'.$key));
+					qa_opt(qa_eqf::field_attr.$key, qa_post_text(qa_eqf::field_attr.'_field'.$key));
+					qa_opt(qa_eqf::field_default.$key, qa_post_text(qa_eqf::field_default.'_field'.$key));
+					qa_opt(qa_eqf::field_form_pos.$key, qa_post_text(qa_eqf::field_form_pos.'_field'.$key));
+					qa_opt(qa_eqf::field_display.$key, (int)qa_post_text(qa_eqf::field_display.'_field'.$key));
+					qa_opt(qa_eqf::field_label.$key, qa_post_text(qa_eqf::field_label.'_field'.$key));
+					qa_opt(qa_eqf::field_page_pos.$key, qa_post_text(qa_eqf::field_page_pos.'_field'.$key));
+					qa_opt(qa_eqf::field_hide_blank.$key, (int)qa_post_text(qa_eqf::field_hide_blank.'_field'.$key));
+					qa_opt(qa_eqf::field_required.$key, (int)qa_post_text(qa_eqf::field_required.'_field'.$key));
 				}
-				$saved = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::SAVED_MESSAGE);
+				$saved = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::saved_message);
 			}
-			if (qa_clicked(qa_eqf::DFL_BUTTON)) {
-				$eqf->init_extra_fields(qa_eqf::FIELD_COUNT_MAX);
+			if (qa_clicked(qa_eqf::dfl_button)) {
+				$eqf->init_extra_fields(qa_eqf::field_count_max);
 				foreach ($eqf->extra_fields as $key => $extra_field) {
-					qa_opt(qa_eqf::FIELD_ACTIVE.$key, (int)$extra_field['active']);
-					qa_opt(qa_eqf::FIELD_PROMPT.$key, $extra_field['prompt']);
-					qa_opt(qa_eqf::FIELD_NOTE.$key, $extra_field['note']);
-					qa_opt(qa_eqf::FIELD_TYPE.$key, $extra_field['type']);
-					qa_opt(qa_eqf::FIELD_OPTION.$key, $extra_field['option']);
-					qa_opt(qa_eqf::FIELD_ATTR.$key, $extra_field['attr']);
-					qa_opt(qa_eqf::FIELD_DEFAULT.$key, $extra_field['default']);
-					qa_opt(qa_eqf::FIELD_FORM_POS.$key, $extra_field['form_pos']);
-					qa_opt(qa_eqf::FIELD_DISPLAY.$key, (int)$extra_field['display']);
-					qa_opt(qa_eqf::FIELD_LABEL.$key, $extra_field['label']);
-					qa_opt(qa_eqf::FIELD_PAGE_POS.$key, $extra_field['page_pos']);
-					qa_opt(qa_eqf::FIELD_HIDE_BLANK.$key, (int)$extra_field['displayblank']);
-					qa_opt(qa_eqf::FIELD_REQUIRED.$key, (int)$extra_field['required']);
+					qa_opt(qa_eqf::field_active.$key, (int)$extra_field['active']);
+					qa_opt(qa_eqf::field_prompt.$key, $extra_field['prompt']);
+					qa_opt(qa_eqf::field_note.$key, $extra_field['note']);
+					qa_opt(qa_eqf::field_type.$key, $extra_field['type']);
+					qa_opt(qa_eqf::field_option.$key, $extra_field['option']);
+					qa_opt(qa_eqf::field_attr.$key, $extra_field['attr']);
+					qa_opt(qa_eqf::field_default.$key, $extra_field['default']);
+					qa_opt(qa_eqf::field_form_pos.$key, $extra_field['form_pos']);
+					qa_opt(qa_eqf::field_display.$key, (int)$extra_field['display']);
+					qa_opt(qa_eqf::field_label.$key, $extra_field['label']);
+					qa_opt(qa_eqf::field_page_pos.$key, $extra_field['page_pos']);
+					qa_opt(qa_eqf::field_hide_blank.$key, (int)$extra_field['displayblank']);
+					qa_opt(qa_eqf::field_required.$key, (int)$extra_field['required']);
 				}
-				$eqf->extra_field_count = qa_eqf::FIELD_COUNT_DFL;
-				qa_opt(qa_eqf::FIELD_COUNT,$eqf->extra_field_count);
-				$eqf->init_extra_fields($eqf->extra_field_count);
-				$eqf->extra_field_maxfile_size = qa_eqf::MAXFILE_SIZE_DFL;
-				$eqf->extra_field_only_image = qa_eqf::ONLY_IMAGE_DFL;
-				$eqf->extra_field_image_maxwidth = qa_eqf::IMAGE_MAXWIDTH_DFL;
-				$eqf->extra_field_image_maxheight = qa_eqf::IMAGE_MAXHEIGHT_DFL;
-				$eqf->extra_field_thumb_size = qa_eqf::THUMB_SIZE_DFL;
-				$eqf->extra_field_lightbox_effect = qa_eqf::LIGHTBOX_EFFECT_DFL;
-				qa_opt(qa_eqf::THUMB_SIZE,$eqf->extra_field_thumb_size);
-				$saved = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::RESET_MESSAGE);
+				$eqf->eqf_count = qa_eqf::field_count_dfl;
+				qa_opt(qa_eqf::field_count,$eqf->eqf_count);
+				$eqf->init_extra_fields($eqf->eqf_count);
+				$eqf->eqf_maxfile_size = qa_eqf::maxfile_size_dfl;
+				$eqf->eqf_only_image = qa_eqf::only_image_dfl;
+				$eqf->eqf_image_maxwidth = qa_eqf::image_maxwidth_dfl;
+				$eqf->eqf_image_maxheight = qa_eqf::image_maxheight_dfl;
+				$eqf->eqf_thumb_size = qa_eqf::thumb_size_dfl;
+				$eqf->eqf_lightbox_effect = qa_eqf::lightbox_effect_dfl;
+				qa_opt(qa_eqf::thumb_size,$eqf->eqf_thumb_size);
+				$saved = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::reset_message);
 			}
 			if ($saved == '' && !$error) {
-				$eqf->extra_field_count = qa_opt(qa_eqf::FIELD_COUNT);
-				if(!is_numeric($eqf->extra_field_count))
-					$eqf->extra_field_count = qa_eqf::FIELD_COUNT_DFL;
-				$eqf->init_extra_fields($eqf->extra_field_count);
-				$eqf->extra_field_maxfile_size = qa_opt(qa_eqf::MAXFILE_SIZE);
-				if(!is_numeric($eqf->extra_field_maxfile_size))
-					$eqf->extra_field_maxfile_size = qa_eqf::MAXFILE_SIZE_DFL;
-				$eqf->extra_field_image_maxwidth = qa_opt(qa_eqf::IMAGE_MAXWIDTH);
-				if(!is_numeric($eqf->extra_field_image_maxwidth))
-					$eqf->extra_field_image_maxwidth = qa_eqf::IMAGE_MAXWIDTH_DFL;
-				$eqf->extra_field_image_maxheight = qa_opt(qa_eqf::IMAGE_MAXHEIGHT);
-				if(!is_numeric($eqf->extra_field_image_maxheight))
-					$eqf->extra_field_image_maxheight = qa_eqf::IMAGE_MAXHEIGHT_DFL;
-				$eqf->extra_field_thumb_size = qa_opt(qa_eqf::THUMB_SIZE);
-				if(!is_numeric($eqf->extra_field_thumb_size))
-					$eqf->extra_field_thumb_size = qa_eqf::THUMB_SIZE_DFL;
+				$eqf->eqf_count = qa_opt(qa_eqf::field_count);
+				if(!is_numeric($eqf->eqf_count))
+					$eqf->eqf_count = qa_eqf::field_count_dfl;
+				$eqf->init_extra_fields($eqf->eqf_count);
+				$eqf->eqf_maxfile_size = qa_opt(qa_eqf::maxfile_size);
+				if(!is_numeric($eqf->eqf_maxfile_size))
+					$eqf->eqf_maxfile_size = qa_eqf::maxfile_size_dfl;
+				$eqf->eqf_image_maxwidth = qa_opt(qa_eqf::image_maxwidth);
+				if(!is_numeric($eqf->eqf_image_maxwidth))
+					$eqf->eqf_image_maxwidth = qa_eqf::image_maxwidth_dfl;
+				$eqf->eqf_image_maxheight = qa_opt(qa_eqf::image_maxheight);
+				if(!is_numeric($eqf->eqf_image_maxheight))
+					$eqf->eqf_image_maxheight = qa_eqf::image_maxheight_dfl;
+				$eqf->eqf_thumb_size = qa_opt(qa_eqf::thumb_size);
+				if(!is_numeric($eqf->eqf_thumb_size))
+					$eqf->eqf_thumb_size = qa_eqf::thumb_size_dfl;
 			}
 			$rules = array();
 			foreach ($eqf->extra_fields as $key => $extra_field) {
-				$rules[qa_eqf::FIELD_PROMPT.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_NOTE.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_TYPE.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_OPTION.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_ATTR.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_DEFAULT.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_FORM_POS.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_DISPLAY.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_LABEL.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_PAGE_POS.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_HIDE_BLANK.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
-				$rules[qa_eqf::FIELD_REQUIRED.$key] = qa_eqf::FIELD_ACTIVE.'_field'.$key;
+				$rules[qa_eqf::field_prompt.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_note.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_type.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_option.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_attr.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_default.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_form_pos.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_display.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_label.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_page_pos.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_hide_blank.$key] = qa_eqf::field_active.'_field'.$key;
+				$rules[qa_eqf::field_required.$key] = qa_eqf::field_active.'_field'.$key;
 			}
 			qa_set_display_rules($qa_content, $rules);
 
@@ -213,230 +214,236 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 
 			$fields = array();
 			$fieldoption = array();
-			for($i=qa_eqf::FIELD_COUNT_DFL;$i<=qa_eqf::FIELD_COUNT_MAX;$i++) {
+			for($i=qa_eqf::field_count_dfl;$i<=qa_eqf::field_count_max;$i++) {
 				$fieldoption[(string)$i] = (string)$i;
 			}
 			$fields[] = array(
-				'id' => qa_eqf::FIELD_COUNT,
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_COUNT.'_label'),
-				'value' => qa_opt(qa_eqf::FIELD_COUNT),
-				'tags' => 'NAME="'.qa_eqf::FIELD_COUNT.'_field"',
+				'id' => qa_eqf::field_count,
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_count.'_label'),
+				'value' => qa_opt(qa_eqf::field_count),
+				'tags' => 'name="'.qa_eqf::field_count.'_field"',
 				'type' => 'select',
 				'options' => $fieldoption,
-				'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_COUNT.'_note'),
+				'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_count.'_note'),
 			);
 			$fields[] = array(
-				'id' => qa_eqf::MAXFILE_SIZE,
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::MAXFILE_SIZE.'_label'),
-				'value' => qa_opt(qa_eqf::MAXFILE_SIZE),
-				'tags' => 'NAME="'.qa_eqf::MAXFILE_SIZE.'_field"',
+				'id' => qa_eqf::maxfile_size,
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::maxfile_size.'_label'),
+				'value' => qa_opt(qa_eqf::maxfile_size),
+				'tags' => 'name="'.qa_eqf::maxfile_size.'_field"',
 				'type' => 'number',
 				'suffix' => 'bytes',
-				'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::MAXFILE_SIZE.'_note'),
+				'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::maxfile_size.'_note'),
 			);
 			$fields[] = array(
-				'id' => qa_eqf::ONLY_IMAGE,
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::ONLY_IMAGE.'_label'),
+				'id' => qa_eqf::only_image,
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::only_image.'_label'),
 				'type' => 'checkbox',
-				'value' => (int)qa_opt(qa_eqf::ONLY_IMAGE),
-				'tags' => 'NAME="'.qa_eqf::ONLY_IMAGE.'_field"',
+				'value' => (int)qa_opt(qa_eqf::only_image),
+				'tags' => 'name="'.qa_eqf::only_image.'_field"',
 			);
 			$fields[] = array(
-				'id' => qa_eqf::IMAGE_MAXWIDTH,
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::IMAGE_MAXWIDTH.'_label'),
-				'value' => qa_opt(qa_eqf::IMAGE_MAXWIDTH),
-				'tags' => 'NAME="'.qa_eqf::IMAGE_MAXWIDTH.'_field"',
+				'id' => qa_eqf::image_maxwidth,
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::image_maxwidth.'_label'),
+				'value' => qa_opt(qa_eqf::image_maxwidth),
+				'tags' => 'name="'.qa_eqf::image_maxwidth.'_field"',
 				'type' => 'number',
 				'suffix' => qa_lang_html('admin/pixels'),
-				'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::IMAGE_MAXWIDTH.'_note'),
+				'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::image_maxwidth.'_note'),
 			);
 			$fields[] = array(
-				'id' => qa_eqf::IMAGE_MAXHEIGHT,
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::IMAGE_MAXHEIGHT.'_label'),
-				'value' => qa_opt(qa_eqf::IMAGE_MAXHEIGHT),
-				'tags' => 'NAME="'.qa_eqf::IMAGE_MAXHEIGHT.'_field"',
+				'id' => qa_eqf::image_maxheight,
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::image_maxheight.'_label'),
+				'value' => qa_opt(qa_eqf::image_maxheight),
+				'tags' => 'name="'.qa_eqf::image_maxheight.'_field"',
 				'type' => 'number',
 				'suffix' => qa_lang_html('admin/pixels'),
-				'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::IMAGE_MAXHEIGHT.'_note'),
+				'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::image_maxheight.'_note'),
 			);
 			$fields[] = array(
-				'id' => qa_eqf::THUMB_SIZE,
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::THUMB_SIZE.'_label'),
-				'value' => qa_opt(qa_eqf::THUMB_SIZE),
-				'tags' => 'NAME="'.qa_eqf::THUMB_SIZE.'_field"',
+				'id' => qa_eqf::thumb_size,
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::thumb_size.'_label'),
+				'value' => qa_opt(qa_eqf::thumb_size),
+				'tags' => 'name="'.qa_eqf::thumb_size.'_field"',
 				'type' => 'number',
 				'suffix' => qa_lang_html('admin/pixels'),
-				'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::THUMB_SIZE.'_note'),
+				'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::thumb_size.'_note'),
 			);
 			$fields[] = array(
-				'id' => qa_eqf::LIGHTBOX_EFFECT,
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::LIGHTBOX_EFFECT.'_label'),
+				'id' => qa_eqf::lightbox_effect,
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::lightbox_effect.'_label'),
 				'type' => 'checkbox',
-				'value' => (int)qa_opt(qa_eqf::LIGHTBOX_EFFECT),
-				'tags' => 'NAME="'.qa_eqf::LIGHTBOX_EFFECT.'_field"',
+				'value' => (int)qa_opt(qa_eqf::lightbox_effect),
+				'tags' => 'name="'.qa_eqf::lightbox_effect.'_field"',
 			);
-			$type = array(qa_eqf::FIELD_TYPE_TEXT => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_TYPE_TEXT_LABEL)
-						, qa_eqf::FIELD_TYPE_TEXTAREA => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_TYPE_TEXTAREA_LABEL)
-						, qa_eqf::FIELD_TYPE_CHECK => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_TYPE_CHECK_LABEL)
-						, qa_eqf::FIELD_TYPE_SELECT => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_TYPE_SELECT_LABEL)
-						, qa_eqf::FIELD_TYPE_RADIO => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_TYPE_RADIO_LABEL)
-						, qa_eqf::FIELD_TYPE_FILE => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_TYPE_FILE_LABEL)
+			$type = array(qa_eqf::field_type_text => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_type_text_label)
+						, qa_eqf::field_type_textarea => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_type_textarea_label)
+						, qa_eqf::field_type_check => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_type_check_label)
+						, qa_eqf::field_type_select => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_type_select_label)
+						, qa_eqf::field_type_radio => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_type_radio_label)
+						, qa_eqf::field_type_file => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_type_file_label)
 			);
 
 			$form_pos = array();
-			$form_pos[qa_eqf::FIELD_FORM_POS_TOP] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_TOP_LABEL);
+			$form_pos[qa_eqf::field_form_pos_top] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_top_label);
 			if(qa_opt('show_custom_ask'))
-				$form_pos[qa_eqf::FIELD_FORM_POS_CUSTOM] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_CUSTOM_LABEL);
-			$form_pos[qa_eqf::FIELD_FORM_POS_TITLE] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_TITLE_LABEL);
+				$form_pos[qa_eqf::field_form_pos_custom] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_custom_label);
+			$form_pos[qa_eqf::field_form_pos_title] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_title_label);
 			if (qa_using_categories())
-				$form_pos[qa_eqf::FIELD_FORM_POS_CATEGORY] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_CATEGORY_LABEL);
-			$form_pos[qa_eqf::FIELD_FORM_POS_CONTENT] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_CONTENT_LABEL);
-			if (qa_opt('extra_field_active'))
-				$form_pos[qa_eqf::FIELD_FORM_POS_EXTRA] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_EXTRA_LABEL);
+				$form_pos[qa_eqf::field_form_pos_category] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_category_label);
+			$form_pos[qa_eqf::field_form_pos_content] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_content_label);
+			if (qa_opt('eqf_active'))
+				$form_pos[qa_eqf::field_form_pos_extra] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_extra_label);
 			if (qa_using_tags())
-				$form_pos[qa_eqf::FIELD_FORM_POS_TAGS] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_TAGS_LABEL);
-			$form_pos[qa_eqf::FIELD_FORM_POS_NOTIFY] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_NOTIFY_LABEL);
-			$form_pos[qa_eqf::FIELD_FORM_POS_BOTTOM] = qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS_BOTTOM_LABEL);
+				$form_pos[qa_eqf::field_form_pos_tags] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_tags_label);
+			$form_pos[qa_eqf::field_form_pos_notify] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_notify_label);
+			$form_pos[qa_eqf::field_form_pos_bottom] = qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_form_pos_bottom_label);
 
-			$page_pos = array(qa_eqf::FIELD_PAGE_POS_UPPER => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_PAGE_POS_UPPER_LABEL)
-							, qa_eqf::FIELD_PAGE_POS_INSIDE => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_PAGE_POS_INSIDE_LABEL)
-							, qa_eqf::FIELD_PAGE_POS_BELOW => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_PAGE_POS_BELOW_LABEL)
+			$page_pos = array(qa_eqf::field_page_pos_upper => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_page_pos_upper_label)
+							, qa_eqf::field_page_pos_inside => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_page_pos_inside_label)
+							, qa_eqf::field_page_pos_below => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::field_page_pos_below_label)
 			);
 			
 			foreach ($eqf->extra_fields as $key => $extra_field) {
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_ACTIVE.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_ACTIVE.'_label',$key),
+					'id' => qa_eqf::field_active.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_active.'_label',$key),
 					'type' => 'checkbox',
-					'value' => (int)qa_opt(qa_eqf::FIELD_ACTIVE.$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_ACTIVE.'_field'.$key.'" ID="'.qa_eqf::FIELD_ACTIVE.'_field'.$key.'"',
+					'value' => (int)qa_opt(qa_eqf::field_active.$key),
+					'tags' => 'name="'.qa_eqf::field_active.'_field'.$key.'" id="'.qa_eqf::field_active.'_field'.$key.'"',
 					'error' => $error_active[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_PROMPT.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_PROMPT.'_label',$key),
-					'value' => qa_html(qa_opt(qa_eqf::FIELD_PROMPT.$key)),
-					'tags' => 'NAME="'.qa_eqf::FIELD_PROMPT.'_field'.$key.'" ID="'.qa_eqf::FIELD_PROMPT.'_field'.$key.'"',
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_PROMPT.'_note',$key),
+					'id' => qa_eqf::field_prompt.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_prompt.'_label',$key),
+					'value' => qa_html(qa_opt(qa_eqf::field_prompt.$key)),
+					'tags' => 'name="'.qa_eqf::field_prompt.'_field'.$key.'" id="'.qa_eqf::field_prompt.'_field'.$key.'"',
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_prompt.'_note',$key),
 					'error' => $error_prompt[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_NOTE.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_NOTE.'_label',$key),
+					'id' => qa_eqf::field_note.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_note.'_label',$key),
 					'type' => 'textarea',
-					'value' => qa_opt(qa_eqf::FIELD_NOTE.$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_NOTE.'_field'.$key.'" ID="'.qa_eqf::FIELD_NOTE.'_field'.$key.'"',
-					'rows' => $eqf->extra_field_note_height,
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_NOTE.'_note',$key),
+					'value' => qa_opt(qa_eqf::field_note.$key),
+					'tags' => 'name="'.qa_eqf::field_note.'_field'.$key.'" id="'.qa_eqf::field_note.'_field'.$key.'"',
+					'rows' => $eqf->eqf_note_height,
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_note.'_note',$key),
 					'error' => $error_note[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_TYPE.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_TYPE.'_label',$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_TYPE.'_field'.$key.'" ID="'.qa_eqf::FIELD_TYPE.'_field'.$key.'"',
+					'id' => qa_eqf::field_type.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_type.'_label',$key),
+					'tags' => 'name="'.qa_eqf::field_type.'_field'.$key.'" id="'.qa_eqf::field_type.'_field'.$key.'"',
 					'type' => 'select',
 					'options' => $type,
-					'value' => @$type[qa_opt(qa_eqf::FIELD_TYPE.$key)],
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_TYPE.'_note',$key),
+					'value' => @$type[qa_opt(qa_eqf::field_type.$key)],
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_type.'_note',$key),
 					'error' => $error_type[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_OPTION.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_OPTION.'_label',$key),
+					'id' => qa_eqf::field_option.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_option.'_label',$key),
 					'type' => 'textarea',
-					'value' => qa_opt(qa_eqf::FIELD_OPTION.$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_OPTION.'_field'.$key.'" ID="'.qa_eqf::FIELD_OPTION.'_field'.$key.'"',
-					'rows' => $eqf->extra_field_option_height,
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_OPTION.'_note',$key),
+					'value' => qa_opt(qa_eqf::field_option.$key),
+					'tags' => 'name="'.qa_eqf::field_option.'_field'.$key.'" id="'.qa_eqf::field_option.'_field'.$key.'"',
+					'rows' => $eqf->eqf_option_height,
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_option.'_note',$key),
 					'error' => $error_option[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_ATTR.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_ATTR.'_label',$key),
-					'value' => qa_html(qa_opt(qa_eqf::FIELD_ATTR.$key)),
-					'tags' => 'NAME="'.qa_eqf::FIELD_ATTR.'_field'.$key.'" ID="'.qa_eqf::FIELD_ATTR.'_field'.$key.'"',
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_ATTR.'_note',$key),
+					'id' => qa_eqf::field_attr.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_attr.'_label',$key),
+					'value' => qa_html(qa_opt(qa_eqf::field_attr.$key)),
+					'tags' => 'name="'.qa_eqf::field_attr.'_field'.$key.'" id="'.qa_eqf::field_attr.'_field'.$key.'"',
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_attr.'_note',$key),
 					'error' => $error_attr[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_DEFAULT.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_DEFAULT.'_label',$key),
-					'value' => qa_html(qa_opt(qa_eqf::FIELD_DEFAULT.$key)),
-					'tags' => 'NAME="'.qa_eqf::FIELD_DEFAULT.'_field'.$key.'" ID="'.qa_eqf::FIELD_DEFAULT.'_field'.$key.'"',
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_DEFAULT.'_note',$key),
+					'id' => qa_eqf::field_default.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_default.'_label',$key),
+					'value' => qa_html(qa_opt(qa_eqf::field_default.$key)),
+					'tags' => 'name="'.qa_eqf::field_default.'_field'.$key.'" id="'.qa_eqf::field_default.'_field'.$key.'"',
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_default.'_note',$key),
 					'error' => $error_default[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_FORM_POS.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS.'_label',$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_FORM_POS.'_field'.$key.'" ID="'.qa_eqf::FIELD_FORM_POS.'_field'.$key.'"',
+					'id' => qa_eqf::field_form_pos.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_form_pos.'_label',$key),
+					'tags' => 'name="'.qa_eqf::field_form_pos.'_field'.$key.'" id="'.qa_eqf::field_form_pos.'_field'.$key.'"',
 					'type' => 'select',
 					'options' => $form_pos,
-					'value' => @$form_pos[qa_opt(qa_eqf::FIELD_FORM_POS.$key)],
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_FORM_POS.'_note',$key),
+					'value' => @$form_pos[qa_opt(qa_eqf::field_form_pos.$key)],
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_form_pos.'_note',$key),
 					'error' => $error_form_pos[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_DISPLAY.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_DISPLAY.'_label',$key),
+					'id' => qa_eqf::field_display.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_display.'_label',$key),
 					'type' => 'checkbox',
-					'value' => (int)qa_opt(qa_eqf::FIELD_DISPLAY.$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_DISPLAY.'_field'.$key.'" ID="'.qa_eqf::FIELD_DISPLAY.'_field'.$key.'"',
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_DISPLAY.'_note',$key),
+					'value' => (int)qa_opt(qa_eqf::field_display.$key),
+					'tags' => 'name="'.qa_eqf::field_display.'_field'.$key.'" id="'.qa_eqf::field_display.'_field'.$key.'"',
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_display.'_note',$key),
 					'error' => $error_display[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_LABEL.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_LABEL.'_label',$key),
-					'value' => qa_html(qa_opt(qa_eqf::FIELD_LABEL.$key)),
-					'tags' => 'NAME="'.qa_eqf::FIELD_LABEL.'_field'.$key.'" ID="'.qa_eqf::FIELD_LABEL.'_field'.$key.'"',
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_LABEL.'_note',$key),
+					'id' => qa_eqf::field_label.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_label.'_label',$key),
+					'value' => qa_html(qa_opt(qa_eqf::field_label.$key)),
+					'tags' => 'name="'.qa_eqf::field_label.'_field'.$key.'" id="'.qa_eqf::field_label.'_field'.$key.'"',
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_label.'_note',$key),
 					'error' => $error_label[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_PAGE_POS.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_PAGE_POS.'_label',$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_PAGE_POS.'_field'.$key.'" ID="'.qa_eqf::FIELD_PAGE_POS.'_field'.$key.'"',
+					'id' => qa_eqf::field_page_pos.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_page_pos.'_label',$key),
+					'tags' => 'name="'.qa_eqf::field_page_pos.'_field'.$key.'" id="'.qa_eqf::field_page_pos.'_field'.$key.'"',
 					'type' => 'select',
 					'options' => $page_pos,
-					'value' => @$page_pos[qa_opt(qa_eqf::FIELD_PAGE_POS.$key)],
-					'note' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_PAGE_POS.'_note',str_replace('^', $key, qa_eqf::FIELD_PAGE_POS_HOOK)),
+					'value' => @$page_pos[qa_opt(qa_eqf::field_page_pos.$key)],
+					'note' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_page_pos.'_note',str_replace('^', $key, qa_eqf::field_page_pos_hook)),
 					'error' => $error_page_pos[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_HIDE_BLANK.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_HIDE_BLANK.'_label',$key),
+					'id' => qa_eqf::field_hide_blank.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_hide_blank.'_label',$key),
 					'type' => 'checkbox',
-					'value' => (int)qa_opt(qa_eqf::FIELD_HIDE_BLANK.$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_HIDE_BLANK.'_field'.$key.'" ID="'.qa_eqf::FIELD_HIDE_BLANK.'_field'.$key.'"',
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_HIDE_BLANK.'_note',$key),
+					'value' => (int)qa_opt(qa_eqf::field_hide_blank.$key),
+					'tags' => 'name="'.qa_eqf::field_hide_blank.'_field'.$key.'" id="'.qa_eqf::field_hide_blank.'_field'.$key.'"',
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_hide_blank.'_note',$key),
 					'error' => $error_hide_blank[$key],
 				);
 				$fields[] = array(
-					'id' => qa_eqf::FIELD_REQUIRED.$key,
-					'label' => qa_lang_html_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_REQUIRED.'_label',$key),
+					'id' => qa_eqf::field_required.$key,
+					'label' => qa_lang_html_sub(qa_eqf::lang.'/'.qa_eqf::field_required.'_label',$key),
 					'type' => 'checkbox',
-					'value' => (int)qa_opt(qa_eqf::FIELD_REQUIRED.$key),
-					'tags' => 'NAME="'.qa_eqf::FIELD_REQUIRED.'_field'.$key.'" ID="'.qa_eqf::FIELD_REQUIRED.'_field'.$key.'"',
-					'note' => qa_lang(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_REQUIRED.'_note',$key),
+					'value' => (int)qa_opt(qa_eqf::field_required.$key),
+					'tags' => 'name="'.qa_eqf::field_required.'_field'.$key.'" id="'.qa_eqf::field_required.'_field'.$key.'"',
+					'note' => qa_lang(qa_eqf::lang.'/'.qa_eqf::field_required.'_note',$key),
 					'error' => $error_required[$key],
 				);
 			}
-			$this->content['custom'] = '<p>This plugin is a fork from <a href="http://www.cmsbox.jp/">sama55@CMSBOX\'s</a> plugin now no longer available</p>';	
-			$this->content['form']['fields'] = $fields;
-			$this->content['form']['style'] = 'wide';
 			
 			$buttons = array();
-			$buttons[] = array(
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::SAVE_BUTTON),
-				'tags' => 'NAME="'.qa_eqf::SAVE_BUTTON.'" ID="'.qa_eqf::SAVE_BUTTON.'"',
+			$buttons['save'] = array(
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::save_button),
+				'tags' => 'name="'.qa_eqf::save_button.'" id="'.qa_eqf::save_button.'"',
 			);
-			$buttons[] = array(
-				'label' => qa_lang_html(qa_eqf::PLUGIN.'/'.qa_eqf::DFL_BUTTON),
-				'tags' => 'NAME="'.qa_eqf::DFL_BUTTON.'" ID="'.qa_eqf::DFL_BUTTON.'"',
+			$buttons['reset'] = array(
+				'label' => qa_lang_html(qa_eqf::lang.'/'.qa_eqf::dfl_button),
+				'tags' => 'name="'.qa_eqf::dfl_button.'" id="'.qa_eqf::dfl_button.'"',
 			);
-			$this->content['form']['buttons'] = $buttons;
 			
+			$this->content['form'] = array(
+				'tags' => 'method="post" action="'.qa_path_html(qa_request()).'"',
+				'style' => 'wide',
+				'fields' => $fields,
+				'buttons' => $buttons
+			);
+			
+			if($saved != '' && !$error)
+				$this->content['form']['ok'] = $saved;
+
 			return $this->content;
 		}
 		

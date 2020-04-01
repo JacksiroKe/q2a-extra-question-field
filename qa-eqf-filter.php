@@ -5,7 +5,7 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 }
 require_once QA_INCLUDE_DIR.'qa-filter-basic.php';
 require_once QA_INCLUDE_DIR.'qa-app-upload.php';
-require_once QA_PLUGIN_DIR.'extra-question-field/qa-eqf.php';
+require_once QA_PLUGIN_DIR.'q2a-extra-question-field/qa-eqf.php';
 
 $qa_extra_question_fields;
 
@@ -14,12 +14,12 @@ class qa_eqf_filter {
 		global $qa_extra_question_fields;
 		$qa_extra_question_fields = array();
 		$fb = new qa_filter_basic();
-		for($key=1; $key<=qa_eqf::FIELD_COUNT_MAX; $key++) {
-			if(qa_opt(qa_eqf::FIELD_ACTIVE.$key)) {
-				$name = qa_eqf::FIELD_BASE_NAME.$key;
+		for($key=1; $key<=qa_eqf::field_count_max; $key++) {
+			if(qa_opt(qa_eqf::field_active.$key)) {
+				$name = qa_eqf::field_base_name.$key;
 				$extradata = '';
 				$checkvalue = '';
-				if(qa_opt(qa_eqf::FIELD_TYPE.$key) != qa_eqf::FIELD_TYPE_FILE) {
+				if(qa_opt(qa_eqf::field_type.$key) != qa_eqf::field_type_file) {
 					$extradata = qa_post_text($name);
 					$checkvalue = $extradata;
 				} else {
@@ -32,34 +32,34 @@ class qa_eqf_filter {
 							$checkvalue = $oldextradata;
 					}
 				}
-				if(qa_opt(qa_eqf::FIELD_REQUIRED.$key)) {
-					$fb->validate_length($errors, $name, $checkvalue, 1, QA_DB_MAX_CONTENT_LENGTH);
+				if(qa_opt(qa_eqf::field_required.$key)) {
+					$fb->validate_length($errors, $name, $checkvalue, 1, qa_db_max_content_length);
 					if(array_key_exists($name, $errors))
-						$qa_extra_question_fields[$name]['error'] = qa_lang_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_REQUIRED.'_message',qa_opt(qa_eqf::FIELD_PROMPT.$key));
+						$qa_extra_question_fields[$name]['error'] = qa_lang_sub(qa_eqf::plugin.'/'.qa_eqf::field_required.'_message',qa_opt(qa_eqf::field_prompt.$key));
 				}
-				if(qa_opt(qa_eqf::FIELD_TYPE.$key) == qa_eqf::FIELD_TYPE_FILE) {
+				if(qa_opt(qa_eqf::field_type.$key) == qa_eqf::field_type_file) {
 					if(!empty($extradata)) {
 						$file_info = $this->file_info($name);
 						if(is_array($file_info)) {
-							$extstr = qa_opt(qa_eqf::FIELD_OPTION.$key);
+							$extstr = qa_opt(qa_eqf::field_option.$key);
 							if(!empty($extstr)) {
 								$exts = explode(',', $extstr);
 								$names = explode('.', $file_info['name']);
 								if(count($names)>=2) {
 									$ext = $names[count($names)-1];
 									if(!in_array($ext, $exts))
-										$qa_extra_question_fields[$name]['error'] = qa_lang_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_OPTION_EXT_ERROR, $extstr);
+										$qa_extra_question_fields[$name]['error'] = qa_lang_sub(qa_eqf::plugin.'/'.qa_eqf::field_option_ext_error, $extstr);
 								} else
-									$qa_extra_question_fields[$name]['error'] = qa_lang_sub(qa_eqf::PLUGIN.'/'.qa_eqf::FIELD_OPTION_EXT_ERROR, $extstr);
+									$qa_extra_question_fields[$name]['error'] = qa_lang_sub(qa_eqf::plugin.'/'.qa_eqf::field_option_ext_error, $extstr);
 							}
 							if(!isset($qa_extra_question_fields[$name]['error'])) {
 								$result = qa_upload_file(
 									$file_info['tmp_name'],
 									$file_info['name'],
-									qa_opt(qa_eqf::MAXFILE_SIZE),
-									qa_opt(qa_eqf::ONLY_IMAGE),
-									qa_opt(qa_eqf::IMAGE_MAXWIDTH),
-									qa_opt(qa_eqf::IMAGE_MAXHEIGHT)
+									qa_opt(qa_eqf::maxfile_size),
+									qa_opt(qa_eqf::only_image),
+									qa_opt(qa_eqf::image_maxwidth),
+									qa_opt(qa_eqf::image_maxheight)
 									);
 								if(isset($result['error']))
 									$qa_extra_question_fields[$name]['error'] = $result['error'];
