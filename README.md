@@ -5,7 +5,7 @@ Add extra field on question. (textbox, textarea, checkbox, select, select-radio,
 Question2Answer V1.6 and later
 
 ## Installing Instructions
-If you have never installed my Q2A plugins before please consider checking the [Installation Guide](https://github.com/JacksiroKe/q2a-extra-question-field/edit/master/INSTALLING.md)
+If you have never installed my Q2A plugins before please consider checking the [Installation Guide](https://github.com/JacksiroKe/q2a-extra-question-field/master/INSTALLING.md)
 
 ## Options
 ### Extra field count:
