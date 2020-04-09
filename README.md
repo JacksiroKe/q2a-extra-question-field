@@ -4,19 +4,8 @@ Add extra field on question. (textbox, textarea, checkbox, select, select-radio,
 ## Version compatibility
 Question2Answer V1.6 and later
 
-## Installation
-1. Unzip archive any local folder.
-2. Upload q2a-extra-question-field folder under qa-plugin folder.
-3. Log in administrator account.
-4. Select Admin -> Plugins menu.
-5. (Q2A V1.8) Enable plugin and Save
-6. Go to Admin -> Extra Question Field (admin/eqf_admin)
-
-## Uninstallation
-1. Log in administrator account.
-2. Select Admin -> Extra Question Field (admin/eqf_admin)
-3. Click reset button.
-4. Delete q2a-extra-question-field folder under qa-plugin folder.
+## Installing Instructions
+If you have never installed my Q2A plugins before please consider checking the [Installation Guide](https://github.com/JacksiroKe/q2a-extra-question-field/edit/master/INSTALLING.md)
 
 ## Options
 ### Extra field count:
