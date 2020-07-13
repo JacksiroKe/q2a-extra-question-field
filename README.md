@@ -2,7 +2,7 @@
 Add extra field on question. (textbox, textarea, checkbox, select, select-radio, file). Enhance your Extra Question field with file management.
 
 ## Version compatibility
-Question2Answer V1.6 and later
+Question2Answer v1.6 and later
 
 ## Installing Instructions
 If you have never installed my Q2A plugins before please consider checking the [Installation Guide](https://github.com/JacksiroKe/q2a-extra-question-field/blob/master/INSTALLING.md)
