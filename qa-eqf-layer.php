@@ -102,7 +102,7 @@ class qa_html_theme_layer extends qa_html_theme_base {
 						if($format == 'jpg' || $format == 'jpeg' || $format == 'png' || $format == 'gif')
 							$original = '<img src="'.$imageurl.'&qa_size='.$width.'" alt="'.$filename.'" id="'.$name.'-thumb" class="'.qa_eqf::field_base_name.'-thumb"/>';
 						$original = '<a href="'.$imageurl.'" target="_blank" id="'.$name.'-link" class="'.qa_eqf::field_base_name.'-link">' . $original . '</a>';
-						$original .= '<input type="checkbox" name="'.$name.'-remove" id="'.$name.'-remove" class="'.qa_eqf::field_base_name.'-remove"/><label for="'.$name.'-remove">'.qa_lang(qa_eqf::plugin.'/eqf_remove').'</label><br>';
+						$original .= '<input type="checkbox" name="'.$name.'-remove" id="'.$name.'-remove" class="'.qa_eqf::field_base_name.'-remove"/><label for="'.$name.'-remove">'.qa_lang(qa_eqf::lang.'/eqf_remove').'</label><br>';
 						$original .= '<input type="hidden" name="'.$name.'-old" id="'.$name.'-old" value="'.$value.'"/>';
 					}
 					$field['html'] = $original.'<input type="file" class="qa-form-tall-'.$type.'" name="'.$name.'">';
